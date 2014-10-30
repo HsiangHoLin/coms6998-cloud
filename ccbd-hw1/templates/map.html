@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Info windows</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script>
+// This example displays a marker at the center of Australia.
+// When the user clicks the marker, an info window opens.
+
+function initialize() {
+  var myLatlng = new google.maps.LatLng(40.8075, -73.9619);
+  var mapOptions = {
+    zoom: 12,
+    center: myLatlng
+  };
+
+  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+  var tweets = {{ tweets | safe}};
+  if(tweets.length>0){
+    alert(tweets.length + " results found");
+    for (i = 0; i < tweets.length; i++) { 
+      var latlng = new google.maps.LatLng(tweets[i][2][0], tweets[i][2][1])
+      var marker = new google.maps.Marker({
+          position: latlng,
+          map: map,
+          title: tweets[i][0]
+      });
+
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open(map,marker);
+      });
+
+      var contentString = '<div id="content">'+
+        '<p>' + tweets[i][1] + '</p>'+
+        '<p>' + tweets[i][0] + '</p>'+
+        '</div>';
+
+      var infowindow = new google.maps.InfoWindow({
+        content: contentString
+      });
+    }
+    map.setZoom(2);
+  }
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+
+
+
+<body>
+<div style="height: 5%; margin-left:5%; margin-top:2%; padding: 0px;">
+<form name="form" action="/map" method='POST'>
+    <select name="form">
+        <option value="isis">ISIS</option>
+        <option value="iraq">Iraq</option>
+        <option value="obama">Obama</option>
+        <option value="ebola">Ebola</option>
+        <option value="africa">Africa</option>
+        <option value="giants">Giants</option>            
+        <option value="royals">Royals</option>            
+        <option value="world">World</option>            
+        <option value="series">Series</option>            
+        <option value="test">Test</option>            
+    </select>
+    <button type="submit">Find tweets</button>
+</form>
+</div>
+  <div id="map-canvas"></div>
+</body>
+</html>
